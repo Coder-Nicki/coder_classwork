@@ -1,0 +1,40 @@
+const mongoose = require('mongoose');
+
+async function dbConnect(){
+    try {
+        await mongoose.connect('mongodb://localhost:27017/CoderIsAwesome');
+        console.log("Database connected!");
+    } catch (error) {
+        console.log(`dbConnect failed! Error:\n${JSON.stringify(error)}`);
+    }
+}
+
+async function dbClose(){
+    await mongoose.connection.close();
+    console.log("Database disconnected!");
+}
+
+const Develop = mongoose.model('Develop', {
+    name: String,
+    skills: [String]
+});
+
+async function someAppFunction(){
+    await dbConnect();
+
+    let newDev = new Develop({
+        name:"Alex",
+        skills:["HTML", "CSS", "JavaScript"]
+    });
+    
+    await newDev.save().then(() => {
+        console.log("Save successful!");
+    }).catch(error => {
+        console.log("Some error occurred saving data!:\n" + error)
+    });
+    
+    console.log("Closing the DB now so the app doesn't hang open for ages...");
+    await dbClose();
+}
+
+someAppFunction();
